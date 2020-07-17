@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.igeek.dao.DepDao">
+
+    <resultMap id="findDep" type="dep">
+        <id property="depId" column="depId"></id>
+        <result property="depName" column="depName"></result>
+        <result property="empCount" column="empCount"></result>
+        <result property="avgSalary" column="avgSalary"></result>
+        <collection property="empList" javaType="emp">
+            <id property="empId" column="empId"></id>
+            <result property="empName" column="empName"></result>
+            <result property="salary" column="salary"></result>
+            <result property="hireDate" column="hire_date"></result>
+        </collection>
+    </resultMap>
+
+
+   <select id="findAll" resultMap="findDep">
+       select * from dep
+   </select>
+
+    <select id="findByDepId" resultType="dep">
+        select * from dep inner join (select depId,avg(salary) as avgSalary,count(*) as empCount from emp group by depId) n on dep.depId= n.depId where dep.depId=#{depId}
+    </select>
+</mapper>

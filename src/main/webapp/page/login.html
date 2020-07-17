@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="http://localhost:8080/ssm_war_exploded/">
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-1.8.3.js"></script>
+</head>
+<body>
+<form id="loginForm">
+    <input type="text" name="userName" placeholder="用户名"><br>
+    <input type="password" name="password" placeholder="密码"><br>
+    <input type="button" value="登录" id="login">
+</form>
+<div id="error" style="color:red;"></div>
+</body>
+</html>
+
+<script>
+    $(function () {
+       $("#login").click(function () {
+           $.ajax({
+               url:"login",
+               data:$("#loginForm").serialize(),
+               dataType:"json",
+               success:function (data) {
+                   if (data.code == 0){
+                       location.href ="page/index.html";
+                   }
+                   else{
+                       $("#error").html(data.message);
+                   }
+               }
+           })
+       })
+    })
+</script>

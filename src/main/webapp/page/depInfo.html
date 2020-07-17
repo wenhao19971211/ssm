@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="http://localhost:8080/ssm_war_exploded/">
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/common.js"></script>
+    <script src="js/jquery-1.8.3.js"></script>
+
+</head>
+<body>
+<table id="depInfo" border="1" style="border-collapse: collapse">
+    <tr>
+        <td>部门编号</td>
+        <td>部门名称</td>
+        <td>部门人数</td>
+        <td>部门平均薪资</td>
+    </tr>
+</table>
+<input type="button" value="查看部门人员" id="selectEmp">
+<div id="empInfo" style="display: none">
+    <table id="empList" border="1" style="border-collapse: collapse">
+        <tr>
+            <td>姓名</td>
+            <td>薪水</td>
+            <td>入职时间</td>
+            <td>编辑</td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
+<script>
+
+
+        var param = parseUrl(location.href);
+        var depId = param["depId"];
+        $.ajax({
+            url:"depInfo",
+            data:{"depId":depId},
+            type:"get",
+            dataType:"json",
+            success:function (data) {
+                if (data.code == 1){
+                    $("#depInfo").append("<tr>" +
+                        "<td>"+data.result.depId+"</td>" +
+                        "<td>"+data.result.depName+"</td>" +
+                        "<td>"+data.result.empCount+"</td>" +
+                        "<td>"+data.result.avgSalary+"</td>" +
+                        "</tr>");
+                }
+            }
+        })
+
+        /**
+         * 查看部门人员
+         */
+        $("#selectEmp").click(function () {
+            $.ajax({
+                url:"selectEmp",
+                data:{"depId":depId},
+                type:"get",
+                dataType:"json",
+                success:function (data) {
+                    $("#empInfo").show();
+                    for (var i = 0; i < data.result.length; i++){
+                        var hireDate = parseDate(data.result[i].hireDate);
+                        var emp = "<tr>" +
+                            "<td>"+data.result[i].empName+"</td>" +
+                            "<td><input type='text' id='"+data.result[i].empId+"' value='"+data.result[i].salary+"' disabled='true'></td>" +
+                            "<td>"+hireDate+"</td>" +
+                            "<td><input type='button' value='编辑' onclick='updateSalary("+data.result[i].empId+")'></td></tr>>";
+                        $("#empList").append(emp);
+                    }
+                }
+            })
+        })
+        /**
+         * 修改薪资
+         * @param empId
+         */
+        function updateSalary(empId) {
+            if ($(this).val("编辑")){
+                $(this).val("保存");
+            }
+            else{
+                $(this).val("编辑");
+                $("#"+empId).attr("disabled",false);
+                var salary = $("#"+empId).val();
+                $.ajax({
+                    url:"update",
+                    data:{"empId":empId,"salary":salary},
+                    dataType:"json",
+                    type:"put",
+                    success:function (data) {
+                        $("#"+empId).attr("disabled",true);
+                    }
+                })
+            }
+        }
+
+
+</script>
